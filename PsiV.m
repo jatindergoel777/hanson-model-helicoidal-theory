@@ -17,4 +17,4 @@ else
     fx = @(x) (1-4*x.^2).*exp(1i*kx.*x); 
 end
 
-out = integral(fx,-0.5,0.5);
+out = integral(fx,-0.5,0.5,'ArrayValued',true);
