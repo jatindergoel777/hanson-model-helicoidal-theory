@@ -13,23 +13,40 @@ else
 end
 %% Blade properties
 inputData.bD = csvread([inputFolder,file.bD]);
-prop.bD = interp1(inputData.bD(:,1),inputData.bD(:,2),prop.r_mu,'spline','extrap');
+prop.bD = interp1(inputData.bD(:,1),inputData.bD(:,2),prop.r_mu,'spline',NaN);
+NaNidx = isnan(prop.bD);
+prop.bD(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.bD(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+clear NaNidx
 
 inputData.tb = csvread([inputFolder,file.tb]);
-prop.tb = interp1(inputData.tb(:,1),inputData.tb(:,2),prop.r_mu,'spline','extrap'); %t/c
+prop.tb = interp1(inputData.tb(:,1),inputData.tb(:,2),prop.r_mu,'spline',NaN); %t/c
+NaNidx = isnan(prop.tb);
+prop.tb(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.tb(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+clear NaNidx
 
 inputData.FA = csvread([inputFolder,file.FA]);
-prop.FA = interp1(inputData.FA(:,1),inputData.FA(:,2),prop.r_mu,'spline','extrap'); 
+prop.FA = interp1(inputData.FA(:,1),inputData.FA(:,2),prop.r_mu,'spline',NaN);
+NaNidx = isnan(prop.FA);
+prop.FA(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.FA(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+clear NaNidx
 
 inputData.MCA = csvread([inputFolder,file.MCA]);
 prop.MCA = interp1(inputData.MCA(:,1),inputData.MCA(:,2),prop.r_mu,'spline','extrap'); 
-
+NaNidx = isnan(prop.MCA);
+prop.MCA(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.MCA(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+clear NaNidx
 %% Propeller loading
 inputData.Cl = csvread([inputFolder,file.Cl]);
-prop.Cl = interp1(inputData.Cl(:,1),inputData.Cl(:,2),prop.r_mu,'spline','extrap'); 
+prop.Cl = interp1(inputData.Cl(:,1),inputData.Cl(:,2),prop.r_mu,'spline',NaN); 
+NaNidx = isnan(prop.Cl);
+prop.Cl(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.Cl(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+clear NaNidx
 
 inputData.Cd = csvread([inputFolder,file.Cd]);
-prop.Cd = interp1(inputData.Cd(:,1),inputData.Cd(:,2),prop.r_mu,'spline','extrap'); 
+prop.Cd = interp1(inputData.Cd(:,1),inputData.Cd(:,2),prop.r_mu,'spline',NaN); 
+NaNidx = isnan(prop.Cd);
+prop.Cd(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.Cd(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+clear NaNidx 
 
 
 %% operating conditions
@@ -42,8 +59,13 @@ op.beta = sqrt(1-op.Mfl^2);
 %% Observer location
 
 %%%% visual coordinates
-obs.theta = atan2(obs.R,obs.x);    %observer angle in axial direction [rad]
-obs.r = sqrt(obs.R.^2 + obs.x.^2);    % observer distance from propeller center [-]
+if isempty(obs.theta) && isempty(obs.r)
+    obs.theta = atan2(obs.R,obs.x);    %observer angle in axial direction [rad]
+    obs.r = sqrt(obs.R.^2 + obs.x.^2);    % observer distance from propeller center [-]
+elseif isempty(obs.R) && isempty(obs.x)
+    obs.R = obs.r.*sin(obs.theta); 
+    obs.x = obs.r.*cos(obs.theta);
+end
 
 %%%% Retarded system
 obs.S0 = sqrt(obs.x.^2 + op.beta^2*obs.R.^2);
