@@ -4,13 +4,15 @@
 
 %% Discretization
 if strcmp(prop.method,'cosine')
-    prop.r_mu = cosspace(prop.hub,prop.rt,prop.mu)./prop.rt;
+    prop.r_muNodes = cosspace(prop.hub,prop.rt,prop.mu+1)./prop.rt;
 elseif strcmp(prop.method,'linear')
-    prop.r_mu = linspace(prop.hub,prop.rt,prop.mu)./prop.rt;
+    prop.r_muNodes = linspace(prop.hub,prop.rt,prop.mu+1)./prop.rt;
 else
     warning('Wrong Input! Calculations will continue with <strong>linear</strong> method')
-    prop.r_mu = linspace(prop.hub,prop.rt,prop.mu)./prop.rt;
+    prop.r_muNodes = linspace(prop.hub,prop.rt,prop.mu+1)./prop.rt;
 end
+    prop.r_mu = (prop.r_muNodes(1:end-1)+prop.r_muNodes(2:end))/2;
+    prop.dz = diff(prop.r_muNodes);
 %% Blade properties
 inputData.bD = csvread([inputFolder,file.bD]);
 prop.bD = interp1(inputData.bD(:,1),inputData.bD(:,2),prop.r_mu,'spline',NaN);
@@ -48,6 +50,21 @@ NaNidx = isnan(prop.Cd);
 prop.Cd(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.Cd(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
 clear NaNidx 
 
+if TQ.flag
+    inputData.dT = csvread([inputFolder,TQ.file.dT]);
+    prop.dT = interp1(inputData.dT(:,1),inputData.dT(:,2),prop.r_mu,'spline',NaN); 
+    NaNidx = isnan(prop.dT);
+    prop.dT(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.dT(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+    prop.dTdz = prop.dT.*prop.rt.*prop.B;
+    clear NaNidx 
+    
+    inputData.dQ = csvread([inputFolder,TQ.file.dQ]);
+    prop.dQ = interp1(inputData.dQ(:,1),inputData.dQ(:,2),prop.r_mu,'spline',NaN); 
+    NaNidx = isnan(prop.dQ);
+    prop.dQ(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.dQ(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+    prop.dQdz = prop.dQ.*prop.rt.*prop.B;
+    clear NaNidx 
+end
 
 %% operating conditions
 op.Mx = op.Mfl + op.Min;                        %Effective Mach number [-]

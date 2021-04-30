@@ -1,4 +1,4 @@
-function P = hanson(Amb,prop,op,obs,dep,m)
+function P = hanson(Amb,prop,op,obs,dep,m,TQ)
 nbytes = 0;
 for o = 1:length(obs.x)
     for k = 1:length(m)
@@ -21,12 +21,27 @@ for o = 1:length(obs.x)
         hm.f3.Dm(k,:) = 1i*hm.kx(k,:).*(prop.Cd/2).*psiLoadKx;
         hm.f3.Lm(k,:) = -1i*hm.ky(k,:).*(prop.Cl/2).*psiLoadKx;
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        if TQ.flag
+            prop.phi = asin(op.Mx./op.Mr);
+            hm.f4 = prop.B.*prop.bD.*(Amb.rho*Amb.c0^2).*op.Mr.^2.*prop.rt^2;
+            hm.f3.Tm(k,:) = -1i.*psiLoadKx./(2*hm.f4).*(hm.kx(k,:).*sin(prop.phi)+ hm.ky(k,:).*cos(prop.phi)).*prop.dTdz;
+            hm.f3.Qm(k,:) = 1i.*psiLoadKx./(2*hm.f4).*(hm.kx(k,:).*cos(prop.phi)- hm.ky(k,:).*sin(prop.phi)).*prop.dQdz./(prop.rt.*prop.r_mu);
+
+            hm.PTm(k,:) = trapz(prop.r_mu,hm.f1(k,:).*hm.f2(k,:).*hm.f3.Tm(k,:));
+            hm.PQm(k,:) = trapz(prop.r_mu,hm.f1(k,:).*hm.f2(k,:).*hm.f3.Qm(k,:));
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                
         hm.PVm(k,:) = trapz(prop.r_mu,hm.f1(k,:).*hm.f2(k,:).*hm.f3.Vm(k,:));
         hm.PDm(k,:) = trapz(prop.r_mu,hm.f1(k,:).*hm.f2(k,:).*hm.f3.Dm(k,:));
         hm.PLm(k,:) = trapz(prop.r_mu,hm.f1(k,:).*hm.f2(k,:).*hm.f3.Lm(k,:));
-        
         hm.P(k,:) = hm.PVm(k,:) + hm.PDm(k,:) + hm.PLm(k,:);
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %if TQ.flag
+        %    hm.diffP(k,:) = hm.PDm(k,:) + hm.PLm(k,:) - (hm.PTm(k,:) + hm.PQm(k,:)); 
+        %end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Print progress
         fprintf(repmat('\b',1,nbytes))
         nbytes = fprintf('Progress = %.02f%% \n', 100*(((o-1)*length(m)+k)/(length(m)*length(obs.x))));
@@ -34,5 +49,10 @@ for o = 1:length(obs.x)
     P.Vm(:,o) = hm.PVm;
     P.Lm(:,o) = hm.PLm;
     P.Dm(:,o) = hm.PDm;
+    if TQ.flag
+        P.Tm(:,o) = hm.PTm;
+        P.Qm(:,o) = hm.PQm;
+    %    P.diffm(:,o) = hm.diffP;
+    end
     P.Totalm(:,o) = hm.P;
 end
