@@ -1,14 +1,12 @@
 clearvars
 clc
-J = 1.15;
-idx = 41;
 UserInput
 inputHanson
 %% Harmonics
 m = 1:2; %harmonic
 
 %% calculate acoustic pressure
-P = hanson(Amb,prop,op,obs,dep,m,TQ);
+P = hanson(Amb,prop,op,obs,dep,m);
 
 %% post-processing
 % steps = 500;
@@ -16,4 +14,4 @@ P = hanson(Amb,prop,op,obs,dep,m,TQ);
 % plot(t.range,t.p)
 % hold on
 
-SPL = SPLprocessing(Amb,P,TQ);
+SPL = SPLprocessing(Amb,P);

@@ -13,7 +13,7 @@ prop.mu = 100;                  % No. of elements in the radial direction [-]
 prop.method = 'linear';         % Two options - 'linear' or 'cosine' for distribution of elements along blade span
 
 %% Blade properties
-inputFolder = './InputData/Xprop/';   % Folder with blade properties contianing csv files
+inputFolder = './InputData/SR2/';   % Folder with blade properties contianing csv files
 file.bD = 'bd_rR.csv';          % chord to diamater ratio (csv file)
 
 file.tb = 'tb_rR.csv';          % maximum thickness to chord ratio (csv file)
@@ -22,18 +22,18 @@ prop.thick_dist = 'parabolic';      % Two options - 'parabolic' or 'uniform' for
 file.FA = 'FA_rR.csv';          % Face alignment [m] or offset (csv file)
 file.MCA = 'MCA_rR.csv';        % midchord alignment or sweep [m] for wept blades (csv file)
 
-file.Cl = sprintf('/Loading/RANS_ClwithoutInduction_rR_J%.02f_idx%d.csv',J,idx);          % Lift coefficient distrbution along blade span
-file.Cd = sprintf('/Loading/RANS_CdwithoutInduction_rR_J%.02f_idx%d.csv',J,idx);          % Drag coefficient distribution along blade span
+%% Analysis type - Either provide Cl and Cd files or Thurst and Toqrue files, leaver the other two empty as ''
 prop.load_dist = 'parabolic';      % Two options - 'parabolic' or 'uniform' for loading distrbution along the chord
 
-%% Thrust Torque noise
-TQ.flag = 1;                    % Switch to turn on the calculation of thrust and torque noise
-TQ.file.dT = sprintf('/Loading/RANS_dT_rR_J%.02f_idx%d.csv',J,idx);              % propeller thrust distribution per blade along radial direction
-TQ.file.dQ = sprintf('/Loading/RANS_dQ_rR_J%.02f_idx%d.csv',J,idx);              % propeller torque distribution per blade along radial direction
+file.Cl = 'Cl_rR.csv';   % Lift coefficient distrbution along blade span (without induction)
+file.Cd = 'Cd_rR.csv';   % Drag coefficient distrbution along blade span (without induction)
+file.dTNdr = '';        % propeller thrust distribution per blade along radial direction
+file.dQNdr = '';        % propeller torque distribution per blade along radial direction
+
 %% operating condition
 op.Min = 0;                  % inflow Mach number [-]
-op.Mfl = 43.29211446/Amb.c0;                     % flight Mach number [-] 
-op.Mht = sqrt((92.67241297*2*pi*0.2032)^2 + 43.29211446^2)/Amb.c0;                 % Helical tip Mach number [-]
+op.Mfl = 45/Amb.c0;                     % flight Mach number [-] 
+op.Mht = sqrt((93*2*pi*0.2032)^2 + 45^2)/Amb.c0;                 % Helical tip Mach number [-]
 
 %% Observer location
 obs.R = [];             % prependicualr distance in plane of rotation/ propeller radius [-]

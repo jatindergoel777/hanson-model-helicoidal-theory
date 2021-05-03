@@ -37,34 +37,6 @@ prop.MCA = interp1(inputData.MCA(:,1),inputData.MCA(:,2),prop.r_mu,'spline','ext
 NaNidx = isnan(prop.MCA);
 prop.MCA(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.MCA(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
 clear NaNidx
-%% Propeller loading
-inputData.Cl = csvread([inputFolder,file.Cl]);
-prop.Cl = interp1(inputData.Cl(:,1),inputData.Cl(:,2),prop.r_mu,'spline',NaN); 
-NaNidx = isnan(prop.Cl);
-prop.Cl(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.Cl(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
-clear NaNidx
-
-inputData.Cd = csvread([inputFolder,file.Cd]);
-prop.Cd = interp1(inputData.Cd(:,1),inputData.Cd(:,2),prop.r_mu,'spline',NaN); 
-NaNidx = isnan(prop.Cd);
-prop.Cd(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.Cd(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
-clear NaNidx 
-
-if TQ.flag
-    inputData.dT = csvread([inputFolder,TQ.file.dT]);
-    prop.dT = interp1(inputData.dT(:,1),inputData.dT(:,2),prop.r_mu,'spline',NaN); 
-    NaNidx = isnan(prop.dT);
-    prop.dT(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.dT(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
-    prop.dTdz = prop.dT.*prop.rt.*prop.B;
-    clear NaNidx 
-    
-    inputData.dQ = csvread([inputFolder,TQ.file.dQ]);
-    prop.dQ = interp1(inputData.dQ(:,1),inputData.dQ(:,2),prop.r_mu,'spline',NaN); 
-    NaNidx = isnan(prop.dQ);
-    prop.dQ(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.dQ(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
-    prop.dQdz = prop.dQ.*prop.rt.*prop.B;
-    clear NaNidx 
-end
 
 %% operating conditions
 op.Mx = op.Mfl + op.Min;                        %Effective Mach number [-]
@@ -95,3 +67,46 @@ obs.thetar = atan2(obs.R,obs.xr);    %observer angle in axial direction [rad]
 
 dep.df = 1-op.Mfl*cos(obs.thetar); %Doppler factor [-]
 dep.omegaD = op.omega./dep.df;
+
+%% Propeller loading
+ClCdFlag = ~isempty(file.Cl) && ~isempty(file.Cd);
+TQFlag = ~isempty(file.dTNdr) && ~isempty(file.dQNdr);
+if  ClCdFlag && ~TQFlag
+    inputData.Cl = csvread([inputFolder,file.Cl]);
+    prop.Cl = interp1(inputData.Cl(:,1),inputData.Cl(:,2),prop.r_mu,'spline',NaN); 
+    NaNidx = isnan(prop.Cl);
+    prop.Cl(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.Cl(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+    clear NaNidx
+
+    inputData.Cd = csvread([inputFolder,file.Cd]);
+    prop.Cd = interp1(inputData.Cd(:,1),inputData.Cd(:,2),prop.r_mu,'spline',NaN); 
+    NaNidx = isnan(prop.Cd);
+    prop.Cd(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.Cd(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+    clear NaNidx
+    
+    out = TQLD(prop.Cl,prop.Cd,Amb.rho,op.Mx*Amb.c0,op.omega,prop.r_mu*prop.rt,prop.bD*2*prop.rt,'LD2TQ');
+    prop.dTdz = out(1,:).*prop.rt.*prop.B;
+    prop.dQdz = out(2,:).*prop.rt.*prop.B;
+    clear out
+elseif  TQFlag && ~ClCdFlag
+    inputData.dTNdr = csvread([inputFolder,file.dTNdr]);
+    prop.dTNdr = interp1(inputData.dTNdr(:,1),inputData.dTNdr(:,2),prop.r_mu,'spline',NaN); 
+    NaNidx = isnan(prop.dTNdr);
+    prop.dTNdr(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.dTNdr(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+    prop.dTdz = prop.dTNdr.*prop.rt.*prop.B;
+    clear NaNidx
+    
+    inputData.dQNdr = csvread([inputFolder,file.dQNdr]);
+    prop.dQNdr = interp1(inputData.dQNdr(:,1),inputData.dQNdr(:,2),prop.r_mu,'spline',NaN); 
+    NaNidx = isnan(prop.dQNdr);
+    prop.dQNdr(NaNidx) = interp1(prop.r_mu(~NaNidx),prop.dQNdr(~NaNidx),prop.r_mu(NaNidx),'nearest','extrap');
+    prop.dQdz = prop.dQNdr.*prop.rt.*prop.B;
+    clear NaNidx
+    
+    out = TQLD(prop.dTNdr,prop.dQNdr,Amb.rho,op.Mx*Amb.c0,op.omega,prop.r_mu*prop.rt,prop.bD*2*prop.rt,'TQ2LD');
+    prop.Cl = out(1,:);
+    prop.Cd = out(2,:);
+    clear out
+else
+    error('Error. \nPlease provide the file name either for CL and CD (file.Cl, file.Cd), or for Thrust and Torque (file.dTNdr,file.dQNdr).\n')
+end
