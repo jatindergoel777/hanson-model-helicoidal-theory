@@ -1,2 +1,7 @@
 InputData/SR2/
 LiftDragNoiseCode/
+figures/
+chordDistResults/
+UserInputRANS_pitchVariation.m
+UserInputBEM_pitchVariation.m
+UserInputBEMRANS.m
