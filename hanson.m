@@ -13,18 +13,28 @@ for o = 1:length(obs.x)
             ./(8*pi*(obs.R(o)./2)*dep.df(o));
         
         bsl = besselj(m(k)*prop.B,m(k)*prop.B*prop.r_mu*op.Mt*sin(obs.thetar(o))/dep.df(o));
-        psiVKx = PsiV(hm.kx(k,:),prop.thick_dist);
-        psiLoadKx = PsiLoad(hm.kx(k,:),prop.load_dist);
-        
+        if strcmp(prop.thick_dist,'custom')
+            psiVKx = PsiV(hm.kx(k,:),prop.thick_dist, prop.xc,prop.HX);
+        else
+            psiVKx = PsiV(hm.kx(k,:),prop.thick_dist);
+        end
+        if strcmp(prop.load_dist,'custom')
+           psiLKx = PsiLoad(hm.kx(k,:),prop.load_dist, prop.xc,prop.fLX); 
+           psiDKx = PsiLoad(hm.kx(k,:),prop.load_dist, prop.xc,prop.fDX); 
+        else
+            psiLoadKx = PsiLoad(hm.kx(k,:),prop.load_dist);
+            psiLKx = psiLoadKx;
+            psiDKx = psiLoadKx;
+        end
         hm.f2(k,:) = op.Mr.^2.*exp(1i*(hm.phi0(k,:) + hm.phis(k,:))).*bsl;
         hm.f3.Vm(k,:) = hm.kx(k,:).^2.*prop.tb.*psiVKx;   
-        hm.f3.Dm(k,:) = 1i*hm.kx(k,:).*(prop.Cd/2).*psiLoadKx;
-        hm.f3.Lm(k,:) = -1i*hm.ky(k,:).*(prop.Cl/2).*psiLoadKx;
+        hm.f3.Dm(k,:) = 1i*hm.kx(k,:).*(prop.Cd/2).*psiDKx;
+        hm.f3.Lm(k,:) = -1i*hm.ky(k,:).*(prop.Cl/2).*psiLKx;
         
         prop.phi = asin(op.Mx./op.Mr);
         hm.f4 = prop.B.*prop.bD.*(Amb.rho*Amb.c0^2).*op.Mr.^2.*prop.rt^2;
-        hm.f3.Tm(k,:) = -1i.*psiLoadKx./(2*hm.f4).*(hm.kx(k,:).*sin(prop.phi)+ hm.ky(k,:).*cos(prop.phi)).*prop.dTdz;
-        hm.f3.Qm(k,:) = 1i.*psiLoadKx./(2*hm.f4).*(hm.kx(k,:).*cos(prop.phi)- hm.ky(k,:).*sin(prop.phi)).*prop.dQdz./(prop.rt.*prop.r_mu);
+        hm.f3.Tm(k,:) = -1i./(2*hm.f4).*(hm.kx(k,:).*sin(prop.phi).*psiDKx + hm.ky(k,:).*cos(prop.phi).*psiLKx).*prop.dTdz;
+        hm.f3.Qm(k,:) = 1i./(2*hm.f4).*(hm.kx(k,:).*cos(prop.phi).*psiDKx- hm.ky(k,:).*sin(prop.phi).*psiLKx).*prop.dQdz./(prop.rt.*prop.r_mu);
 
         hm.PVm(k,:) = trapz(prop.r_mu,hm.f1(k,:).*hm.f2(k,:).*hm.f3.Vm(k,:));
         hm.PDm(k,:) = trapz(prop.r_mu,hm.f1(k,:).*hm.f2(k,:).*hm.f3.Dm(k,:));
@@ -36,11 +46,14 @@ for o = 1:length(obs.x)
         %% Print progress
         fprintf(repmat('\b',1,nbytes))
         nbytes = fprintf('Progress = %.02f%% \n', 100*(((o-1)*length(m)+k)/(length(m)*length(obs.x))));
+        
+    P.kxMax(k,o) = max(hm.kx(k,:));
     end
     P.Vm(:,o) = hm.PVm;
     P.Lm(:,o) = hm.PLm;
     P.Dm(:,o) = hm.PDm;
     P.Tm(:,o) = hm.PTm;
     P.Qm(:,o) = hm.PQm;
+    
 %     P.Totalm(:,o) = hm.P;
 end
