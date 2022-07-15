@@ -1,4 +1,8 @@
 InputData/SR2/
+InputData/Xprop/BEM_Loading/
+InputData/Xprop/Loading_all/
+InputData/Xprop/RANS_Loading/
+InputData/Xprop/zeroLoading/
 LiftDragNoiseCode/
 figures/
 chordDistResults/
