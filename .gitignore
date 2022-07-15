@@ -9,3 +9,7 @@ chordDistResults/
 UserInputRANS_pitchVariation.m
 UserInputBEM_pitchVariation.m
 UserInputBEMRANS.m
+UserInput_J120V30B3pitch30.m
+UserInput_zeroLoading.m
+thicknessCurve_fit.fig
+thicknessCurve_fit.png
