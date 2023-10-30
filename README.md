@@ -12,6 +12,11 @@ In this repository you can find:
 - `InputData/' directory containg the propeller geometry and loading input files
 - The pdf file of the Reference paper "Helicoidal Surface Theory for Harmonic Noise of Propellers in the Far Field"
 
+To use this code:
+- Setup the case in **UserInput.m** file. 
+- Set the number of harmonics to be calculated in **Mainfile.m** file by adjusting the parameter `m`.
+- Evalaute your case by running **Mainfile.m** file in Matlab.
+
 ## Documentation
 The theory and mathematical expressions behind the code can be found in the pdf file of the paper "Helicoidal Surface Theory for Harmonic Noise of Propellers in the Far Field" included in the repository.
 
