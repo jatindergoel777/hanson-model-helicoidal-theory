@@ -1,5 +1,5 @@
 # Hanson's Model in Frequency Domain - Tonal Noise of Rotors in Uniform Inflow
-This code is based on the Hanson's Paper titled "Helicoidal Surface Theory for Harmonic Noise of Propellers in the Far Field" with doi "https://doi.org/10.2514/3.50873". This code is meant to be used for tonal noise prediction of rotors with uniform inflow. This code is based on the frequence domain formultion and is only valid for far-field noise predictions.
+This code is based on the Hanson's Paper titled "Helicoidal Surface Theory for Harmonic Noise of Propellers in the Far Field" with doi "https://doi.org/10.2514/3.50873". This code is meant to be used for tonal noise prediction of rotors with uniform inflow with propeller axis aligned with the inflow. This code is based on the frequence domain formultion and is only valid for far-field noise predictions.
 
 ## Requirements
 This code has been developed and tested in Matlab 2021a. Though a higher or lower version of matlab then 2021a should be also ok, the authors cannot guarantee it.
@@ -9,7 +9,7 @@ No additional installation are required  for the code except an acitvated instal
 
 ## Structure
 In this repository you can find:
-- `InputData/' directory containg the propeller geometry and loading input files
+- `InputData/` directory containg the propeller geometry and loading input files
 - The pdf file of the Reference paper "Helicoidal Surface Theory for Harmonic Noise of Propellers in the Far Field"
 
 To use this code:
@@ -24,7 +24,7 @@ The theory and mathematical expressions behind the code can be found in the pdf 
 This software has been developed by
 **Jatinder Goyal** ![ORCID logo](https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png) [0000-0001-7448-8617](https://orcid.org/0000-0001-7448-8617), Technische Universiteit Delft
 
-##License
+## License
 The contents in the `InputData/` directory are licensed under a **CC-BY 4.0** (see [CC-BY-4.0](LICENSES/CC-BY-4.0.txt) file). The source code, and any other file in this repository are licensed under an **Apache License v2.0** (see [Apache-License-v2.0](LICENSES/Apache-License-v2.0.txt) file).
 
 Copyright notice:
