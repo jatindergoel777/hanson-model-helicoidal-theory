@@ -1,3 +1,20 @@
+%{
+Script for setting up the case for Hanson's tonal noise model in frequency domain.
+
+Copyright 2023 Jatinder Goyal
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+%}
 %% User Inputs for Hanson model to caculate tonal noise in frequency domain
 %%  Ambient conditions
 Amb.rho= 1.225;                 % Air density[kg/m^3]
@@ -13,7 +30,7 @@ prop.mu = 100;                  % No. of elements in the radial direction [-]
 prop.method = 'cosine';         % Two options - 'linear' or 'cosine' for distribution of elements along blade span
 
 %% Blade properties
-inputFolder = './InputData/Xprop/';   % Folder with blade properties contianing csv files
+inputFolder = '../data/Xprop/';   % Folder with blade properties contianing csv files
 file.bD = 'bd_rR.csv';          % chord to diamater ratio (csv file)
 file.tb = 'tb_rR.csv';          % maximum thickness to chord ratio (csv file)
 file.FA = 'FA_rR.csv';          % Face alignment [m] or offset (csv file)
@@ -24,6 +41,7 @@ file.thick_dist = 't_xc.csv'; % Give filename if 'custom' distribution is chosen
 %% Analysis type - Either provide Cl and Cd files or Thurst and Toqrue files, leaver the other two empty as ''
 file.Cl_span = 'Loading/BEM_Cl_rR_J1.60_idx71.csv';   % Lift coefficient distrbution along blade span (without induction)
 file.Cd_span = 'Loading/BEM_Cd_rR_J1.60_idx71.csv';   % Drag coefficient distrbution along blade span (without induction)
+
 file.dTNdr = '';        % propeller thrust distribution per blade along radial direction
 file.dQNdr = '';        % propeller torque distribution per blade along radial direction
 
@@ -34,12 +52,12 @@ prop.load_dist = 'custom';      % Three options - 'parabolic','uniform','custom'
 prop.nu = 100;                  % No. of elements in the chorddirection [-], relevant for 'custom' only
 file.Cl_chord = 'Loading/BEM_dCl_dxc_J1.60_idx71.csv';             % Give filename if 'custom' distribution is chosen otherwise you can leave it empty ''
 file.Cd_chord = 'Loading/BEM_dCd_dxc_J1.60_idx71.csv';             % Give filename if 'custom' distribution is chosen otherwise you can leave it empty ''
-%% operating condition
+%% operating condition - Distinction between inflow mach number and flight mach number for Dopller effect
 op.Min = 0;                  % inflow Mach number [-]
 op.Mfl = 54.9567/Amb.c0;                     % flight Mach number [-] 
-op.Mht = sqrt((84.5792*2*pi*0.2032)^2 + 54.9567^2)/Amb.c0;                 % Helical tip Mach number [-]
+op.Mht = sqrt((84.5792*2*pi*prop.rt)^2 + 54.9567^2)/Amb.c0;                 % Helical tip Mach number [-]
 
-%% Observer location
+%% Observer location - either provide R and X or theta and r, leave other two as empty matrix
 obs.R = [];             % prependicualr distance in plane of rotation/ propeller radius [-]
 obs.x = [];             % Observer distance in axial direction/ propeller radius [-] 
 
