@@ -136,7 +136,7 @@ Henri Werij, Dean of Faculty of Aerospace Engineering, Technische Universiteit D
 
 If you use this software, please cite it as below or check out the **CITATION.cff** file.
 
-**How to cite this repository**: Goyal, J., 2023. Hanson's Model in Frequency Domain - Tonal Noise of Rotors in Uniform Inflow. 4TU.ResearchData. Software. [https://doi.org/10.4121/7da5aa45-e44b-4fa3-9407-8bf61e835d99](https://doi.org/10.4121/7da5aa45-e44b-4fa3-9407-8bf61e835d99) 
+**How to cite this repository**: Goyal, J., 2024. Hanson's Model in Frequency Domain - Tonal Noise of Rotors in Uniform Inflow. 4TU.ResearchData. Software. [https://doi.org/10.4121/7da5aa45-e44b-4fa3-9407-8bf61e835d99](https://doi.org/10.4121/7da5aa45-e44b-4fa3-9407-8bf61e835d99) 
 
 
 ## Would you like to contribute?
